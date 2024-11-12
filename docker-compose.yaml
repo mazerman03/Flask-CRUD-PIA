@@ -4,10 +4,10 @@ services:
   db:
     image: mysql:5.7
     environment:
-      MYSQL_ROOT_PASSWORD: yourpassword
-      MYSQL_DATABASE: flaskdb
-      MYSQL_USER: flaskuser
-      MYSQL_PASSWORD: flaskpassword
+      MYSQL_ROOT_PASSWORD: password1234
+      MYSQL_DATABASE: media_tracker_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: mysql1234
     ports:
       - "3306:3306"
     volumes:
@@ -20,6 +20,11 @@ services:
     environment:
       FLASK_APP: app.py
       FLASK_ENV: development
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      MYSQL_DB: media_tracker_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: mysql1234
     ports:
       - "5000:5000"
     depends_on:
@@ -27,6 +32,15 @@ services:
     volumes:
       - .:/app                                   # Mounts the current directory to /app in the container
     command: ["python", "app.py"]                # Command to run the Flask app
+  jenkins:
+    image: jenkins/jenkins:lts
+    user: root
+    ports:
+      - "8080:8080"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
-  mysql-data:                                    # Declares the named volume for MySQL data persistence
+  mysql-data:
+  jenkins_home:                                    # Declares the named volume for MySQL data persistence

@@ -1,6 +1,8 @@
-#TODO: Create Database before altering API routes, and update these values
+#Uses credentials from docker-compose.yaml
 class Config:
-    MYSQL_HOST = "localhost"        # Change to Docker MySQL hostname later
-    MYSQL_USER = "root"             # MySQL username
-    MYSQL_PASSWORD = "yourpassword" # MySQL password
-    MYSQL_DB = "flaskdb"            # Database name
+    MYSQL_HOST = 'db'               
+    MYSQL_PORT = 3306               
+    MYSQL_USER = 'user'        
+    MYSQL_PASSWORD = 'mysql1234'  
+    MYSQL_DB = 'media_tracker_db'            
+
