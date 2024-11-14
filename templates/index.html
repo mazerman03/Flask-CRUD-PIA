@@ -6,7 +6,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body>
-    <h1 class="text-center mt-5 mb-5 text-primary">Python Flask Anime Table</h1>
+    <h1 class="text-center mt-5 mb-5 text-primary"><img src="https://erikstore.com/blog/wp-content/uploads/2024/06/MEJORES-ANIMES-DE-TODOS-LOS-TIEMPOS.jpg" alt="anime" class="img-thumbnail" width="150" height="150">Python Flask Anime Table</h1>
 
     <div class="container">
         <div class="card">
@@ -54,27 +54,78 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
-        // Función para obtener y mostrar los animes en la tabla
         async function fetchAnime() {
-            const response = await fetch('/anime'); // Ajusta la ruta si usas un prefijo en el blueprint
+            const response = await fetch('/anime'); 
             const data = await response.json();
-
+        
             const tableBody = document.getElementById('animeTableBody');
             tableBody.innerHTML = ''; // Limpia la tabla
-
+        
+            // Limpia modales previos
+            const modalContainer = document.createElement('div'); // Contenedor para nuevos modales
+        
             data.forEach(anime => {
+                // Crear una nueva fila para la tabla
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${anime.id}</td>
                     <td>${anime.title}</td>
                     <td>${anime.episodes}</td>
                     <td>${anime.genre}</td>
-                    <td><button class="btn btn-warning" onclick="editAnime(${anime.id})">Edit</button></td>
-                    <td><button class="btn btn-danger" onclick="deleteAnime(${anime.id})">Delete</button></td>
+                    <td>
+                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modal${anime.id}">Edit</button>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteAnime(${anime.id})">Delete</button>
+                    </td>
                 `;
                 tableBody.appendChild(row);
+        
+                // Crear un modal para este anime
+                const modal = document.createElement('div');
+                modal.className = 'modal fade';
+                modal.id = `modal${anime.id}`;
+                modal.tabIndex = -1;
+                modal.setAttribute('aria-labelledby', `modalLabel${anime.id}`);
+                modal.setAttribute('aria-hidden', 'true');
+        
+                modal.innerHTML = `
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="modalLabel${anime.id}">Edit Anime: ${anime.title}</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="editForm${anime.id}" onsubmit="updateAnime(event, ${anime.id})">
+                                    <div class="mb-3">
+                                        <label for="animeTitle${anime.id}" class="form-label">Title</label>
+                                        <input type="text" id="animeTitle${anime.id}" class="form-control" name="title" value="${anime.title}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="animeEpisodes${anime.id}" class="form-label">Episodes</label>
+                                        <input type="number" id="animeEpisodes${anime.id}" class="form-control" name="episodes" value="${anime.episodes}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="animeGenre${anime.id}" class="form-label">Genre</label>
+                                        <input type="text" id="animeGenre${anime.id}" class="form-control" name="genre" value="${anime.genre}" required>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                `;
+        
+                modalContainer.appendChild(modal);
             });
+        
+            // Añade los modales al DOM
+            document.body.appendChild(modalContainer);
         }
+        
 
         // Agregar un nuevo anime
         document.getElementById('animeForm').addEventListener('submit', async (event) => {
@@ -111,6 +162,43 @@
             } else {
                 alert('Error al eliminar el anime.');
             }
+        }
+
+        //Editar un anime
+        function updateAnime(event, animeId) {
+            event.preventDefault(); // Evita que el formulario recargue la página
+        
+            // Obtén los datos del formulario
+            const form = document.getElementById(`editForm${animeId}`);
+            const title = form.querySelector(`[name="title"]`).value;
+            const episodes = form.querySelector(`[name="episodes"]`).value;
+            const genre = form.querySelector(`[name="genre"]`).value;
+        
+            // Realiza la solicitud PUT usando fetch
+            fetch(`/anime/${animeId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: title,
+                    episodes: episodes,
+                    genre: genre
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === "Anime updated successfully") {
+                    alert("Anime updated successfully!");
+                    location.reload(); // Recarga la página para reflejar los cambios
+                } else {
+                    alert("Error updating anime: " + JSON.stringify(data));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Failed to update anime. Please try again.");
+            });
         }
 
         // Inicializar la tabla al cargar la página
