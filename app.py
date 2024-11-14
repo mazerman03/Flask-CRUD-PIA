@@ -3,8 +3,8 @@ import os
 from models.database import init_db
 from routes.api import api_bp
 
-template_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-template_dir = os.path.join(template_dir, 'templates')
+template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+
 
 app = Flask(__name__, template_folder=template_dir)
 mysql = init_db(app)
