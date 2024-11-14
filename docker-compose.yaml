@@ -32,15 +32,18 @@ services:
     volumes:
       - .:/app                                   # Mounts the current directory to /app in the container
     command: ["python", "app.py"]                # Command to run the Flask app
+
   jenkins:
-    image: jenkins/jenkins:lts
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins             # Custom Dockerfile to add Docker CLI to Jenkins
     user: root
     ports:
       - "8080:8080"
     volumes:
       - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock # Allows Jenkins to interact with Docker
 
 volumes:
   mysql-data:
-  jenkins_home:                                    # Declares the named volume for MySQL data persistence
+  jenkins_home:                                    # Declares the named volume for Jenkins data persistence
