@@ -8,7 +8,13 @@ def get_anime():
     cursor = mysql.connection.cursor()
     cursor.execute("SELECT * FROM anime")
     items = cursor.fetchall()
-    return jsonify(items)
+
+    #Json Format
+    columns = [column[0] for column in cursor.description]
+    results = [dict(zip(columns, item)) for item in items]  
+    
+    return jsonify(results)
+
 
 #Add anime into the DB
 @api_bp.route("/anime", methods=["POST"])
