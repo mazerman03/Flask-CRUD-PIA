@@ -1,4 +1,4 @@
-# Anime CRUD Application
+# Anime CRUD App
 
 This is a Python Flask-based web application that provides a CRUD (Create, Read, Update, Delete) interface for managing an anime database. The application handles data for users, anime, and manga. It is deployed in Docker alongside a MySQL database, with a Jenkins pipeline set up to redeploy the container using webhooks.
 
